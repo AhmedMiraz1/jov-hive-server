@@ -34,6 +34,7 @@ async function run() {
     // Send a ping to confirm a successful connection
 
     const jobsCollection = client.db("jobHive").collection("jobs");
+    const jobApplyCollection = client.db("jobHive").collection("jobData");
 
     app.get("/jobs", async (req, res) => {
       const result = await jobsCollection.find().toArray();
@@ -60,12 +61,37 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/jobs/:email", async (req, res) => {
-    //   const email = req.params.email;
-    //   const query = { 'buyer?.email': email };
-    //   const result = await jobsCollection.find(query).toArray();
-    //   res.send(result);
-    // });
+    app.post('/jobData', async(req, res)=> {
+      const jobData = req.body
+      const result = await jobApplyCollection.insertOne(jobData)
+      res.send(result)
+    })
+
+    app.get("/jobs", async (req, res) => {
+      const result = await jobsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.delete('/job/:id', async(req, res)=> {
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await jobsCollection.deleteOne(query)
+      res.send(result)
+    })
+
+    app.put('/job/:id', async (req, res)=>{
+      const id = req.params.id
+      const jobData = req.body
+      const query = {_id: new ObjectId(id)}
+      const options = { upsert: true }
+      const updateDoc = {
+          $set:{
+            ...jobData
+          }
+      }
+      const result = await jobsCollection.updateOne(query, updateDoc, options)
+      res.send(result)
+    } )
 
 
 
