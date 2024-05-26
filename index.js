@@ -56,7 +56,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
-    // Send a ping to confirm a successful connection
+    
 
     const jobsCollection = client.db("jobHive").collection("jobs");
     const jobApplyCollection = client.db("jobHive").collection("jobData");
@@ -94,8 +94,7 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await jobsCollection.findOne(query);
       res.send(result);
-      // console.log(result);
-      // console.log(id);
+      
     });
 
     app.post("/jobs", async (req, res) => {
@@ -187,4 +186,4 @@ app.listen(port, () => {
   console.log(`server is running on port : ${port}`);
 });
 
-//   console.log(run());
+
