@@ -10,7 +10,7 @@ const port = process.env.PORT || 5000;
 // middleware
 
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://localhost:5173", "https://job-hive-e1f9a.web.app"],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -111,6 +111,15 @@ async function run() {
 
     app.post('/jobData', async(req, res)=> {
       const jobData = req.body
+
+      const alreadyApplied = await jobApplyCollection.findOne({
+        email:jobData.email,
+        joId : jobData.joId
+      })
+     
+      if(alreadyApplied){
+        return res.status(400).send('You have already added job')
+      }
       const result = await jobApplyCollection.insertOne(jobData)
       res.send(result)
     })
@@ -145,15 +154,17 @@ async function run() {
     app.get('/jobData/:email',verifyToken,  async (req, res) => {
       
       const tokenEmail = req.user.email
-      console.log(tokenEmail ,"ghjkl");
       const email = req.params.email
       if(tokenEmail !== email){
         return  res.status(403).send({message:'Forbidden access'})
       }
+      
       const query = { email }
       const result = await jobApplyCollection.find(query).toArray()
       res.send(result)
     })
+
+   
 
 
 
